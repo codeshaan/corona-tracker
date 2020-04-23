@@ -1,7 +1,6 @@
 import { random, hideError, showError } from './utility.js';
 import { inputBox, submitBtn, loader, error, URL } from './utility.js';
 
-let URL_2 = './js/corona_2.json';
 let canvas = document.getElementById('corona-pie-graph');
 let countryChart = canvas.getContext('2d');
 
@@ -41,7 +40,7 @@ function init(e) {
 
     loader.style.display = 'block';
 
-    fetch(URL_2)
+    fetch(URL)
       .then(res => res.json())
       .then(res => {
         loader.style.display = 'none';
@@ -130,7 +129,7 @@ function showIndiaStatus() {
 
   loader.style.display = 'block';
 
-  fetch(URL_2)
+  fetch(URL)
     .then(res => res.json())
     .then(res => {
       loader.style.display = 'none';
