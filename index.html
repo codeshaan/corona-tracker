@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corona-Tracker</title>
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="css/animate.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="css/three-dots.css">
+</head>
+
+<body>
+  <div class="dot-typing-placeholder">
+    <div class="dot-typing"></div>
+  </div>
+
+  <label for="checkbox" id="label-check" class="wow fadeInLeft label-check"><i class="fa fa-align-left menu-btn" aria-hidden="true"></i></label>
+  <input type="checkbox" id="checkbox">
+  <input type="checkbox" id="close-check">
+
+  <aside class="menu">
+    <div>
+      <label for="close-check" id="close-check-id">&times;</label>
+      <img src="./img/logo.jpeg" alt="Shaan Alam">
+      <h3>Shaan Alam</h3>
+      <ul>
+        <li><a href="">Home</a></li>
+      </ul>
+    </div>
+    <div class="socials">
+      <h4>Connect with me on</h4>
+      <div class="links">
+        <a href="https://github.com/shaan71845"><i class="fa fa-github" aria-hidden="true"></i></a>
+        <a href="https://www.facebook.com/shaan.alam.1004"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>
+        <a href=""><i class="fa fa-instagram" aria-hidden="true"></i></a>
+      </div>
+    </div>
+    <div>
+      <p>Made with <span class="heart"><i class="fa fa-heart"></i> by Shaan Alam</span></p>
+    </div>
+  </aside>
+
+  <main>
+    <div class="container">
+      <div class="header">
+        <h1 class="wow fadeInUp">Corona Tracker</h1>
+      </div>
+
+      <div class="actions">
+        <div class="form-group">
+          <input type="text" class="form-control wow fadeInUp" placeholder="Search country....">
+          <span class="error-small">Please type the country name....</span>
+        </div>
+        <button class="submit-btn wow fadeInUp">Submit</button>
+      </div>
+
+      <div class="counters">
+        <div>
+          <h3>Confirmed: </h3> 
+          <span class="counter" data-target="0">0</span>
+        </div>
+
+        <div>
+          <h3>Deaths: </h3> 
+          <span class="counter" data-target="0">0</span>
+        </div>
+
+        <div>
+          <h3>Recovered: </h3> 
+          <span class="counter" data-target="0">0</span>
+        </div>
+      </div>
+      
+      <div class="corona-results wow fadeInUp">
+        <canvas id="corona-pie-graph"></canvas>
+      </div>
+      
+    </div>
+  </main>
+  
+  <script src="js/wow.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+  <script>
+    new WOW().init();
+    </script>
+  <script defer type="module" src="js/utility.js"></script>
+  <script defer type="module" src="js/script.js"></script>
+</body>
+
+</html>
