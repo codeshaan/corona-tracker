@@ -46,7 +46,7 @@ function init(e) {
         loader.style.display = 'none';
         getGraphData(res[countryName]);
       }).catch(err => {
-        error.innerHTML = 'Please check your internet connection!';
+        error.innerHTML = 'Oops.... Something might have went wrong!';
         loader.style.display = 'none';
         showError();
       })
@@ -55,7 +55,7 @@ function init(e) {
   }
 }
 
-function getGraphData (location) {
+function getGraphData(location) {
 
   // console.log(location);
   // updateCount(location);
@@ -73,7 +73,7 @@ function getGraphData (location) {
 
 
     latestDeath = monthData[monthData.length - 1];
-    data[monthNames[i]] = latestDeath;  
+    data[monthNames[i]] = latestDeath;
   }
 
   updateData(data[monthNames[new Date().getMonth() + 1]]);
@@ -81,7 +81,7 @@ function getGraphData (location) {
 
 }
 
-function updateData (data) {
+function updateData(data) {
   const counters = document.querySelectorAll('.counter');
   const speed = 100;
 
@@ -93,7 +93,7 @@ function updateData (data) {
   });
 
 
-  function countDown (counter) {
+  function countDown(counter) {
     let count = +counter.innerText;
     let target = +counter.getAttribute('data-target');
     let rotate = target / speed;
@@ -107,7 +107,7 @@ function updateData (data) {
       return;
     }
   }
-  
+
 }
 
 
