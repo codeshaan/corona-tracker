@@ -1,31 +1,59 @@
-import { random, hideError, showError } from './utility.js';
-import { inputBox, submitBtn, loader, error, URL } from './utility.js';
+// importing utility methods & variables from the utility.js
+import { monthNames, hideError, showError } from './utility.js';
+import { inputBox, submitBtn, loader, error, URL, canvas, countryChart } from './utility.js';
+import { updateCounter } from './utility.js';
 
-let canvas = document.getElementById('corona-pie-graph');
-let countryChart = canvas.getContext('2d');
+// By default show the current status of India
+let currentCountry = 'India';
 
+/* The chart configuration  ===> Do not change chart.options.responsive & chart.options.maintainAspectRatio <====*/
 let chart = new Chart(countryChart, {
   type: 'line',
   data: {
     labels: [],
     datasets: [{
-      label: 'Death Rate - ' + (inputBox.value || "India"),
+      label: 'Confirmed',
       data: [],
-      backgroundColor: `rgba(${random(0, 255)}, ${random(0, 255)}, ${random(0, 255)}, 0.6)`,
+      backgroundColor: 'transparent',
       borderJointStyle: 'miter',
       pointBorderColor: "#fff",
-      pointBackgroundColor: '#ff3600',
+      pointBackgroundColor: '#592bb9',
+      pointBorderWidth: 2,
+      pointHoverRadius: 6,
+      pointRadius: 5,
+    }, {
+      label: 'Deaths',
+      data: [],
+      backgroundColor: 'transparent',
+      borderJointStyle: 'miter',
+      pointBorderColor: "#fff",
+      pointBackgroundColor: '#592bb9',
+      pointBorderWidth: 2,
+      pointHoverRadius: 6,
+      pointRadius: 5,
+    }, {
+      label: 'Recovered',
+      data: [],
+      backgroundColor: 'transparent',
+      borderJointStyle: 'miter',
+      pointBorderColor: "#fff",
+      pointBackgroundColor: '#592bb9',
       pointBorderWidth: 2,
       pointHoverRadius: 6,
       pointRadius: 5,
     }]
   },
-  legend: {
-    position: 'right',
-    labels: {
-      fontColor: '#998'
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    legend: {
+      position: 'top'
     },
-    display: true
+    title: {
+      display: true,
+      text: `${currentCountry}'s  data`,
+      fontSize: 25
+    }
   }
 });
 
@@ -33,110 +61,119 @@ let chart = new Chart(countryChart, {
 function init(e) {
   e.preventDefault();
 
+  // get the query from the user
   if (inputBox.value != '') {
-    let countryName = inputBox.value[0].toUpperCase() + inputBox.value.substring(1);
+
 
     hideError();
+    // hide the error if there is any
 
-    loader.style.display = 'block';
+    // format the country name according to the name stored in the API
 
-    fetch(URL)
-      .then(res => res.json())
-      .then(res => {
-        loader.style.display = 'none';
-        getGraphData(res[countryName]);
-      }).catch(err => {
-        error.innerHTML = 'Oops.... Something might have went wrong!';
-        loader.style.display = 'none';
-        showError();
-      })
+    let countryName = inputBox.value[0].toUpperCase() + inputBox.value.substring(1);
+
+    // change the currentCountry variable
+    currentCountry = countryName;
+
+    if (countryName.split(" ").length > 1) {
+      // if the country name has more than one word separated by space then
+      let countryNameArr = countryName.split(" ");
+
+      countryName = countryNameArr[1] + ", " + countryNameArr[0];
+    }
+
+
+    fetchData(URL, countryName);
+    // fetch the country's data from API
+
   } else {
+    // show error is the input box is empty
     showError();
   }
 }
 
-function getGraphData(location) {
+async function fetchData(URL, countryName) {
+  // The loading animation
+  loader.style.display = 'block';
 
-  // console.log(location);
-  // updateCount(location);
+  try {
+    const res = await fetch(URL);
+    const json = await res.json();
 
-  let monthData, latestDeath;
-  const monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const data = {};
+    // hide the loading animation
+    loader.style.display = 'none';
 
-  for (let i = 1; i <= new Date().getMonth() + 1; i++) {
-    monthData = location.filter(l => {
-      if (l.date.split("-")[1] == i) {
-        return l;
-      }
-    }).filter(l => l.length != 0);
-
-
-    latestDeath = monthData[monthData.length - 1];
-    data[monthNames[i]] = latestDeath;
+    // get the country's data to be plotted on the graph
+    getGraphData(json[countryName]);
+  } catch (err) {
+    console.log(err);
+    error.innerHTML = "Oops...Something might have went wrong!";
+    loader.style.display = 'none';
+    showError();
   }
-
-  updateData(data[monthNames[new Date().getMonth() + 1]]);
-  updateGraphData(data);
-
 }
 
-function updateData(data) {
-  const counters = document.querySelectorAll('.counter');
-  const speed = 100;
 
-  let interval;
+function getGraphData(locationData) {
 
-  counters.forEach((counter, index) => {
-    counter.setAttribute('data-target', Object.values(data).slice(1)[index]);
-    interval = setInterval(countDown, 1, counter);
-  });
+  /* 
+    monthData = stores each day's data of each month
+    currenMonthName = stores current month name
+    data = stores the last day's data of the month (last day's data will show the overall data of that mont)
+  */
 
+  let monthData = [], currentMonthName = '', data = {};
 
-  function countDown(counter) {
-    let count = +counter.innerText;
-    let target = +counter.getAttribute('data-target');
-    let rotate = target / speed;
+  for (let i = 1; i <= new Date().getMonth() + 1; i++) {
+    // Get each month's data of death, confirmed, & recovered & select the latest data from it
+    monthData = locationData.filter(l => l.date.split("-")[1] == i)
 
-    if (count < target) {
-      counter.innerText = Math.floor(count + rotate);
-    } else if (count > target) {
-      counter.innerText = Math.floor(count - rotate);
-    } else if (count === target) {
-      clearInterval(interval);
-      return;
-    }
+    currentMonthName = monthNames[i];
+    data[currentMonthName] = monthData[monthData.length - 1];;
   }
 
+  // show the counting animation for the current status of a country
+  updateCounter(data[currentMonthName]);
+
+  // update the graph based on the each month's status of a country
+  updateGraphData(data);
 }
 
 
 function updateGraphData(data) {
 
-  let labels = Object.keys(data);
-  let deaths = Object.values(data).map(d => d.deaths);
+  // get each month's data;
+  const innerObjects = Object.values(data);
 
+  // get the month names and store it as labels for the graph
+  const labels = Object.keys(data);
+
+  // From the innerObjects.array, grab the confirmed, deaths, & recovered data
+  const deaths = innerObjects.map(obj => obj.deaths);
+  const confirmed = innerObjects.map(obj => obj.confirmed);
+  const recovered = innerObjects.map(obj => obj.recovered);
+
+  // setting new graph here
 
   chart.data.labels = labels;
-  chart.data.datasets[0].data = deaths;
-  chart.data.datasets[0].backgroundColor = `rgba(${random(0, 255)}, ${random(0, 255)}, ${random(0, 255)}, 0.6)`
-  chart.data.datasets[0].label = 'Death Rate - ' + (inputBox.value || "India");
+  chart.options.title.text = `${currentCountry}'s  data`;
+
+  [chart.data.datasets[0].data, chart.data.datasets[1].data, chart.data.datasets[2].data] = [confirmed, deaths, recovered];
+  [chart.data.datasets[0].borderColor, chart.data.datasets[1].borderColor, chart.data.datasets[2].borderColor] = ['#e4f32e', '#e52127', '#2f8b09']
+
+  // update the graph in the UI
   chart.update();
 }
 
 
 function showIndiaStatus() {
-
-  loader.style.display = 'block';
-
-  fetch(URL)
-    .then(res => res.json())
-    .then(res => {
-      loader.style.display = 'none';
-      getGraphData(res['India']);
-    })
+  // This function will fire off when the body of the page loads and show the current status of India by default
+  // currentCountry => 'India';  => This value can change afterwards based on which country user searches...
+  fetchData(URL, currentCountry);
 }
 
+
+// Event Listeners for toggling the sidebar
 
 document.getElementById('label-check').addEventListener('click', () => {
   document.getElementById('close-check').checked = false;
@@ -145,5 +182,8 @@ document.getElementById('close-check-id').addEventListener('click', () => {
   document.getElementById('checkbox').checked = false;
 });
 
+// show India's current status when the page loads
 window.addEventListener('load', showIndiaStatus);
+
+// on click of submit button => init();
 submitBtn.addEventListener('click', init);
